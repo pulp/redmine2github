@@ -7,7 +7,7 @@ import json
 if __name__=='__main__':
     SRC_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sys.path.append(SRC_ROOT)
-
+from time import sleep
 from datetime import datetime
 import requests
 from jinja2 import Template
@@ -19,6 +19,7 @@ from github_issues.milestone_helper import MilestoneHelper
 from github_issues.label_helper import LabelHelper
 import csv
 
+from requests.exceptions import HTTPError
 from settings.base import get_github_auth, REDMINE_SERVER
 
 import pygithub3
@@ -433,6 +434,10 @@ class GithubIssueMaker:
                     , 'redmine_assignee' : self.get_redmine_assignee_name(rd)
         }
 
+        for field in rd.get("custom_fields",[]):
+            if field.get('name') == 'Bugzillas' and field.get('value'):
+                desc_dict["bugzilla"] = field['value']
+
         description_info = template.render(desc_dict)
 
         #
@@ -458,8 +463,17 @@ class GithubIssueMaker:
         #
         # (3) Create the issue on github
         #
-
-        issue_obj = self.get_github_conn().issues.create(github_issue_dict)
+        issue_obj = None
+        wait = 30
+        while issue_obj is None:
+            if wait > 300:
+                raise Exception('Failed to create issue after 5 minutes')
+            try:
+                issue_obj = self.get_github_conn().issues.create(github_issue_dict)
+            except HTTPError:
+                msg('Waiting %s seconds' % wait)
+                sleep(wait)
+                wait *= 2
         #issue_obj = self.get_github_conn().issues.update(151, github_issue_dict)
 
         msgt('Github issue created: %s' % issue_obj.number)

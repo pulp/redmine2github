@@ -2,11 +2,11 @@ redmine_type, redmine_name, github_label_name, github_label_color
 status, Feedback, Feedback, cccccc
 status, Fixed, Fixed, cccccc
 status, Invalid, Invalid, cccccc
-priority, Low, P4: Low, 66ccff
-priority, Normal, P3: Normal, 3399ff
-priority, High, P2: High, 0066ff
-priority, Urgent, P1: Urgent, 0000ff
-priority, Immediate, P1: Urgent, 0000ff
+priority, Low, Low, 66ccff
+priority, Normal, Normal, 3399ff
+priority, High, High, 0066ff
+priority, Urgent, Urgent, 0000ff
+priority, Immediate, Urgent, 0000ff
 tracker, Bug, Bug, ff0000
 tracker, Feature, Feature, ffcc00
 tracker, Task, Task, cc33ff
@@ -23,3 +23,8 @@ Category, Lua API, cat: other, ccff99
 Category, Documentation/Wiki, cat: other, ccff99
 Category, Renderer, cat: renderer, 009933
 Category, Website, cat: other, ccff99
+_, Migrated from Redmine, Migrated from Redmine, ccff99
+_, Groomed, Groomed, 00cc00
+_, New, New, 66ff33
+_, Bugzillas, Bugzillas, B60205
+_, Triaged, Triaged, D93F0B

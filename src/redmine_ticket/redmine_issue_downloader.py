@@ -60,7 +60,7 @@ class RedmineIssueDownloader:
         self.redmine_project = None
 
         self.issue_dirname = join(self.issues_base_directory\
-                                ,  datetime.today().strftime(RedmineIssueDownloader.TIME_FORMAT_STRING)\
+                                ,  project_name_or_identifier.replace(' ', '').replace('-', '_').title()\
                                 )
 
         self.setup()
@@ -226,6 +226,9 @@ print (data['total_count'])
         json_str = self.get_single_issue(single_issue.id)       # another call to redmine
 
         #json_str = json.dumps(single_issue._attributes, indent=4)
+        category = getattr(single_issue, "category", None)
+        if category:
+            return
 
         fullpath = join(self.issue_dirname, self.pad_issue_id(single_issue.id) + '.json')
         open(fullpath, 'w').write(json_str)
