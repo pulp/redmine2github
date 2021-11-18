@@ -9,7 +9,7 @@ try:
     from urlparse import urljoin
 except:
     from urllib.parse import urljoin        # python 3.x
-    
+
 # http://python-redmine.readthedocs.org/
 from redmine import Redmine
 
@@ -29,23 +29,23 @@ class RedmineIssueUpdater:
     """
     For a Redmine project moved to github, update the redmine ticket with the github link
     """
-    
+
     #TIME_FORMAT_STRING = '%Y-%m%d-%H%M'
     TIME_FORMAT_STRING = '%Y-%m%d'
 
     # Redmine tickets are written to JSON files with the naming convention  "(issue id).json"
-    # For file sorting, preceding zeros are tacked on.  
+    # For file sorting, preceding zeros are tacked on.
     #   Example: If  ZERO_PADDING_LEVEL=5:
     #               issue #375 is written to file "00375.json"
     #               issue #1789 is written to file "01789.json"
     #               issue #2 is written to file "00002.json"
     #
     # If your issue numbers go beyond 99,999 then increase the ZERO_PADDING_LEVEL
-    #    
+    #
     def __init__(self, redmine_server, redmine_api_key, project_name_or_identifier, issues_dirname, redmine2github_id_map_filename):
         """
         Constructor
-        
+
         :param redmine_server: str giving the url of the redmine server.  e.g. https://redmine.myorg.edu/
         :param redmine_api_key: str with a redmine api key
         :param project_name_or_identifier: str or int with either the redmine project id or project identifier
@@ -57,20 +57,21 @@ class RedmineIssueUpdater:
         self.issue_dirname = issues_dirname
         msg('redmine2github_id_map_filename: %s' % redmine2github_id_map_filename)
         self.redmine2github_id_map = json.loads(open(redmine2github_id_map_filename, 'rU').read())
-        
+        msg(self.redmine2github_id_map)
+
         self.redmine_conn = None
         self.redmine_project = None
-        
+
         self.jinja_env = Environment(loader=PackageLoader('redmine_ticket', 'templates'))
-        
+
         self.setup()
-        
+
     def setup(self):
         self.connect_to_redmine()
         if not isdir(self.issue_dirname):
             msgx('Directory doesn\'t exist: %s' % self.issue_dirname)
-        
-        
+
+
     def connect_to_redmine(self):
         self.redmine_conn = Redmine(self.redmine_server, key=self.redmine_api_key)
         self.redmine_project = self.redmine_conn.project.get(self.project_name_or_identifier)
@@ -78,19 +79,18 @@ class RedmineIssueUpdater:
 
 
     def update_tickets(self):
-   
+
         redmine_keys = self.redmine2github_id_map.keys()
         redmine_keys.sort()
         redmine_keys = set(redmine_keys)
-        
+
         ticket_cnt = 0
         for redmine_issue_num in redmine_keys:
             ticket_cnt +=1
-            
+
             msgt('(%s) Updating redmine ticket: %s' % (ticket_cnt, redmine_issue_num))
             github_issue_id = self.redmine2github_id_map.get(redmine_issue_num)
             msg('github_issue_id: %s' % github_issue_id)
-    
             fname = redmine_issue_num.zfill(RedmineIssueDownloader.ZERO_PADDING_LEVEL) + '.json'
             redmine_issue_fname = os.path.join(self.issue_dirname, fname)
             if not os.path.isfile(redmine_issue_fname):
@@ -98,13 +98,13 @@ class RedmineIssueUpdater:
             redmine_issue_dict = json.loads(open(redmine_issue_fname, 'rU').read())
 
             github_issue_url = get_gethub_issue_url(github_issue_id)
-            
+
             template = self.jinja_env.get_template('description_with_github_link.md')
 
-            original_description = redmine_issue_dict.get('description', None)                
+            original_description = redmine_issue_dict.get('description', None)
             #if not original_description:
             #    msgx('Description not found in file: %s' % redmine_issue_fname)
-            
+
             template_params = { 'original_description' : original_description\
                           , 'github_issue_id' : github_issue_id\
                           , 'github_repo' : GITHUB_TARGET_REPOSITORY\
@@ -113,32 +113,35 @@ class RedmineIssueUpdater:
                         }
 
             updated_description = template.render(template_params)
-            
+
             #msg(updated_description)
-            
-            update_params = dict(project_id=self.project_name_or_identifier\
-                                , description=updated_description\
-                                )
-            
-            
+
+            CLOSED_DUPLICATE = 12
+            update_params = dict(
+                project_id=self.project_name_or_identifier,
+                description=updated_description,
+                status_id=CLOSED_DUPLICATE,
+            )
+
+
             updated_record =  self.redmine_conn.issue.update(resource_id=int(redmine_issue_num)\
                                         , **update_params)
-            
+
             dashes()
-            
+
             if updated_record is True:
                 msg('-----> Updated!')
             else:
-                msgx('Updated Failed!') 
-                           
-            
-            
+                msgx('Updated Failed!')
+
+
+
 
 
 if __name__=='__main__':
-    from settings.base import REDMINE_SERVER, REDMINE_API_KEY, REDMINE_ISSUES_DIRECTORY, REDMINE_TO_GITHUB_MAP_FILE
-    
-    issues_dir = os.path.join(REDMINE_ISSUES_DIRECTORY, '2014-0902')
+    from settings.base import REDMINE_SERVER, REDMINE_API_KEY, REDMINE_PROJECT_ID, REDMINE_ISSUES_DIRECTORY, REDMINE_TO_GITHUB_MAP_FILE
+    project = os.environ["REDMINE_PROJECT_ID"].replace(' ', '').replace('-', '_').title()
+    issues_dir = os.path.join(REDMINE_ISSUES_DIRECTORY, project)
     #rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, 'dvn', REDMINE_ISSUES_DIRECTORY)
-    rn = RedmineIssueUpdater(REDMINE_SERVER, REDMINE_API_KEY, 1, issues_dir, REDMINE_TO_GITHUB_MAP_FILE)
+    rn = RedmineIssueUpdater(REDMINE_SERVER, REDMINE_API_KEY, REDMINE_PROJECT_ID, issues_dir, REDMINE_TO_GITHUB_MAP_FILE)
     rn.update_tickets()

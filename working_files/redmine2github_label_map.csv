@@ -1,25 +1,34 @@
 redmine_type, redmine_name, github_label_name, github_label_color
-status, Feedback, Feedback, cccccc
-status, Fixed, Fixed, cccccc
-status, Invalid, Invalid, cccccc
-priority, Low, P4: Low, 66ccff
-priority, Normal, P3: Normal, 3399ff
-priority, High, P2: High, 0066ff
-priority, Urgent, P1: Urgent, 0000ff
-priority, Immediate, P1: Urgent, 0000ff
-tracker, Bug, Bug, ff0000
-tracker, Feature, Feature, ffcc00
+status, New, New, 66ff33
+status, Post, Post, cccccc
+status, Assigned, Assigned, cccccc
+status, Modified, Modified, cccccc
+priority, Low, Low, 66ccff
+priority, Normal, Normal, 3399ff
+priority, High, High, 0066ff
+priority, Urgent, Urgent, 0000ff
+priority, Immediate, Urgent, 0000ff
+tracker, Issue, Issue, ff0000
+tracker, Story, Story, ffcc00
 tracker, Task, Task, cc33ff
-Category, General, cat: general, 00cc00
-Category, Server, cat: server, 00cc00
-Category, Client, cat: client, 00cc00
-Category, Mod QAGAME, cat: mod QAGAME, 66ff33
-Category, Mod CGAME, cat: mod CGAME, 66ff33
-Category, Mod UI, cat: mod UI, 66ff33
-Category, Mod generic, cat: mod, 66ff33
-Category, Mod pak3.pk3, cat: mod, 66ff33
-Category, Libs, cat: other, ccff99
-Category, Lua API, cat: other, ccff99
-Category, Documentation/Wiki, cat: other, ccff99
-Category, Renderer, cat: renderer, 009933
-Category, Website, cat: other, ccff99
+tracker, Refactor, Refactor, 29c2c9
+tracker, Test, Test, c3d6ff
+tracker, Backport, Backport, fffc00
+Category, Documentation, Documentation, ccff99
+_, Migrated from Redmine, Migrated from Redmine, ccff99
+_, Groomed, Groomed, 00cc00
+_, Bugzillas, Bugzillas, B60205
+_, Triaged, Triaged, D93F0B
+_, GalaxyNG, GalaxyNG, D93F0B
+_, Katello, Katello, D93F0B
+_, Severity: 1. Low, Severity: Low, 66ccff
+_, Severity: 2. Medium, Severity: Medium, 3399ff
+_, Severity: 3. High, Severity: High, 0066ff
+_, Severity: 4. Urgent, Severity: Urgent, 0066ff
+_, SELinux, SELinux, d12c1f
+_, Wishlist, Wishlist, 95b2f8
+_, Pulp 2, Pulp 2, e0ba50
+_, Performance, Performance, 270409
+_, Dev Environment, Dev Environment, aed4d4
+_, CI/CD, CI/CD, C8A63B
+_, API Bindings, API Bindings, 036360

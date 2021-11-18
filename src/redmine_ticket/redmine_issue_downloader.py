@@ -60,7 +60,7 @@ class RedmineIssueDownloader:
         self.redmine_project = None
 
         self.issue_dirname = join(self.issues_base_directory\
-                                ,  datetime.today().strftime(RedmineIssueDownloader.TIME_FORMAT_STRING)\
+                                ,  project_name_or_identifier.replace(' ', '').replace('-', '_').title()\
                                 )
 
         self.setup()
@@ -226,6 +226,9 @@ print (data['total_count'])
         json_str = self.get_single_issue(single_issue.id)       # another call to redmine
 
         #json_str = json.dumps(single_issue._attributes, indent=4)
+        category = getattr(single_issue, "category", None)
+        if category:
+            return
 
         fullpath = join(self.issue_dirname, self.pad_issue_id(single_issue.id) + '.json')
         open(fullpath, 'w').write(json_str)
@@ -291,7 +294,7 @@ if __name__=='__main__':
     #rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, 'dvn', REDMINE_ISSUES_DIRECTORY)
     #Only import some specific tickets
     #kwargs = dict(specific_tickets_to_download=[1371, 1399, 1843, 2214, 2215, 2216, 3362, 3387, 3397, 3400, 3232, 3271, 3305, 3426, 3425, 3313, 3208])
-    rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, REDMINE_PROJECT_ID, REDMINE_ISSUES_DIRECTORY)
+    rn = RedmineIssueDownloader(REDMINE_SERVER, REDMINE_API_KEY, REDMINE_PROJECT_ID, REDMINE_ISSUES_DIRECTORY, issue_status="open")
     rn.download_tickets2()
 
     msg(rn.get_issue_count())
