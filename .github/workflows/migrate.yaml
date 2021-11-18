@@ -1,0 +1,47 @@
+name: Migrate redmine
+on:
+  workflow_dispatch:
+    inputs:
+      redmine_project:
+        description: "Redmine project name (e.g. ansible_plugin)"
+        required: true
+      target_repository:
+        description: "Github repository"
+        required: false
+jobs:
+  migration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # by default, it uses a depth of 1
+          # this fetches all history so that we can read each commit
+          fetch-depth: 0
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "2.7"
+      - name: Install python dependencies
+        run: |
+          echo ::group::PYDEPS
+          pip install -r requirements/base.txt
+          echo ::endgroup::
+      - name: Setting secrets
+        run: |
+          python .github/workflows/scripts/secrets.py "$SECRETS_CONTEXT"
+          echo "REDMINE_PROJECT_ID=${{ github.event.inputs.redmine_project }}" >> $GITHUB_ENV
+          echo "GITHUB_TARGET_REPOSITORY=${{ github.event.inputs.target_repository }}" >> $GITHUB_ENV
+        env:
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+      - name: Import issues from redmine
+        run: |
+          cd src/redmine_ticket
+          python redmine_issue_downloader.py
+      - name: File Github issues
+        run: |
+          cd src/github_issues
+          python migration_manager.py
+      - name: Close redmine issues
+        if: always()
+        run: |
+          cd src/redmine_ticket
+          python redmine_issue_updater.py
