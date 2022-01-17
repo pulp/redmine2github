@@ -439,6 +439,8 @@ class GithubIssueMaker:
         for field in rd.get("custom_fields",[]):
             if field.get('name') == 'Bugzillas' and field.get('value'):
                 desc_dict["bugzilla"] = field['value']
+                msgt('Skipping Bugzilla')
+                return
 
         description_info = template.render(desc_dict)
 
