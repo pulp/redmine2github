@@ -1,5 +1,6 @@
 from __future__ import print_function
 import os
+from random import randint
 import sys
 import json
 
@@ -557,6 +558,7 @@ class GithubIssueMaker:
 
             comment_obj = None
             try:
+                sleep(randint(10, 45))
                 comment_obj = self.get_comments_service().create(issue_num, comment_info)
             except requests.exceptions.HTTPError as e:
                 msgt('Error creating comment: %s' % e.message)

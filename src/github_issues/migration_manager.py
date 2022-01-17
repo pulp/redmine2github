@@ -5,6 +5,7 @@ if __name__=='__main__':
     sys.path.append(SRC_ROOT)
 
 import time
+import random
 import re
 import json
 from settings.base import get_github_auth, REDMINE_ISSUES_DIRECTORY, USER_MAP_FILE, LABEL_MAP_FILE, MILESTONE_MAP_FILE, REDMINE_TO_GITHUB_MAP_FILE
@@ -243,9 +244,13 @@ class MigrationManager:
                 mapping_dict.update({redmine_issue_num: github_issue_number})
                 self.save_dict_to_file(mapping_dict)
 
+            if issue_cnt % 10 == 0:
+                sec = random.randint(45, 180)
+                msgt('sleep %s seconds....' % (sec))
+                time.sleep(sec)
             if issue_cnt % 50 == 0:
-                msgt('sleep 1 seconds....')
-                time.sleep(1)
+                msgt('Finishing 50 issues batch....')
+                break
 
 if __name__=='__main__':
     project = os.environ["REDMINE_PROJECT_ID"].replace(' ', '').replace('-', '_').title()
